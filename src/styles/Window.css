@@ -1,0 +1,178 @@
+/* ═══════════════════════════
+   Window Component Styles
+   ═══════════════════════════ */
+
+.window-wrapper {
+  position: absolute;
+  pointer-events: auto;
+}
+
+.window-wrapper.maximized {
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+}
+
+.window {
+  background: var(--silver);
+  min-width: 260px;
+  min-height: 180px;
+  resize: both;
+  overflow: auto;
+  box-shadow:
+    inset 1px 1px 0 var(--light),
+    inset -1px -1px 0 var(--mid),
+    inset -2px -2px 0 var(--dark),
+    inset 2px 2px 0 var(--light),
+    4px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.window-wrapper.maximized .window {
+  resize: none;
+  box-shadow:
+    inset 1px 1px 0 var(--light),
+    inset -1px -1px 0 var(--mid),
+    inset -2px -2px 0 var(--dark),
+    inset 2px 2px 0 var(--light);
+}
+
+.title-bar {
+  background: linear-gradient(90deg, #000080, #1084d0);
+  color: #fff;
+  padding: 3px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: move;
+  user-select: none;
+}
+
+.window-wrapper.maximized .title-bar {
+  cursor: default;
+}
+
+.title-bar.focused {
+  background: linear-gradient(90deg, #000080, #1084d0);
+}
+
+.title-bar.unfocused {
+  background: linear-gradient(90deg, #808080, #a0a0a0);
+}
+
+.title-text {
+  font-size: 13px;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 4px;
+}
+
+.title-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Title Bar Buttons (Win95 style) ── */
+.title-btn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  color: #000;
+  user-select: none;
+  cursor: pointer;
+  transition: filter 0.08s;
+  background: var(--silver);
+  box-shadow:
+    inset 1px 1px 0 var(--light),
+    inset -1px -1px 0 var(--mid),
+    inset -2px -2px 0 var(--dark);
+}
+
+.title-btn:hover {
+  filter: brightness(1.08);
+}
+
+.title-btn:active {
+  box-shadow:
+    inset -1px -1px 0 var(--light),
+    inset 1px 1px 0 var(--mid),
+    inset 2px 2px 0 var(--dark);
+}
+
+.title-btn span {
+  line-height: 1;
+  display: block;
+}
+
+/* Minimize button */
+.minimize-btn span {
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* Maximize button */
+.maximize-btn span {
+  font-size: 13px;
+}
+
+/* Close button — red accent on hover */
+.close-btn:hover {
+  background: #e04040;
+  color: #fff;
+}
+
+.close-btn:hover span {
+  color: #fff;
+}
+
+.window-body {
+  padding: 12px;
+  font-size: 13px;
+  overflow: auto;
+}
+
+.window-wrapper.maximized .window-body {
+  height: calc(100% - 28px);
+}
+
+/* ── Resize Handle ── */
+.window::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: se-resize;
+  background:
+    linear-gradient(135deg,
+      transparent 30%,
+      var(--mid) 30%, var(--mid) 40%,
+      transparent 40%, transparent 55%,
+      var(--mid) 55%, var(--mid) 65%,
+      transparent 65%, transparent 80%,
+      var(--mid) 80%, var(--mid) 90%,
+      transparent 90%);
+}
+
+.window-wrapper.maximized .window::after {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .window-wrapper {
+    width: 92vw !important;
+    left: 4vw !important;
+  }
+  
+  .window {
+    width: 100% !important;
+    max-height: 60vh;
+  }
+}

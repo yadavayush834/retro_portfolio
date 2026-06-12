@@ -1,0 +1,171 @@
+/* ═══════════════════════════════════════
+   Win95 Ultimate Edition — Global Styles
+   ═══════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+:root {
+  --teal: #008080;
+  --silver: #c0c0c0;
+  --light: #ffffff;
+  --dark: #000000;
+  --mid: #808080;
+  --blue: #000080;
+  --font: "VT323", "MS Sans Serif", "Courier New", system-ui, monospace;
+  --shadow-outset:
+    inset 1px 1px 0 var(--light),
+    inset -1px -1px 0 var(--mid),
+    inset -2px -2px 0 var(--dark),
+    inset 2px 2px 0 var(--light);
+  --shadow-inset:
+    inset 1px 1px 0 var(--dark),
+    inset -1px -1px 0 var(--light),
+    inset -2px -2px 0 var(--light),
+    inset 2px 2px 0 var(--mid);
+  --shadow-btn:
+    inset 1px 1px 0 var(--light),
+    inset -1px -1px 0 var(--mid),
+    inset -2px -2px 0 var(--dark);
+  --shadow-btn-pressed:
+    inset -1px -1px 0 var(--light),
+    inset 1px 1px 0 var(--mid),
+    inset 2px 2px 0 var(--dark);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font);
+  background: var(--teal);
+  overflow: hidden;
+  font-size: 14px;
+}
+
+/* ── Scrollbar Win95 Style ── */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--silver);
+  box-shadow: var(--shadow-inset);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--silver);
+  box-shadow: var(--shadow-btn);
+}
+
+::-webkit-scrollbar-thumb:active {
+  box-shadow: var(--shadow-btn-pressed);
+}
+
+::-webkit-scrollbar-button {
+  background: var(--silver);
+  box-shadow: var(--shadow-btn);
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Retro Form Elements ── */
+input, textarea, select {
+  font-family: var(--font);
+  font-size: 13px;
+  background: #fff;
+  padding: 6px;
+  border: none;
+  box-shadow: var(--shadow-inset);
+  outline: none;
+}
+
+input:focus, textarea:focus {
+  outline: 1px dotted var(--blue);
+}
+
+button {
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 6px 14px;
+  background: var(--silver);
+  border: none;
+  box-shadow: var(--shadow-btn);
+  cursor: pointer;
+  user-select: none;
+  transition: box-shadow 0.05s;
+}
+
+button:active {
+  box-shadow: var(--shadow-btn-pressed);
+}
+
+button:hover {
+  filter: brightness(1.05);
+}
+
+/* ── Status Inset ── */
+.status-inset {
+  padding: 6px;
+  background: #e0e0e0;
+  box-shadow: var(--shadow-inset);
+  font-size: 12px;
+}
+
+/* ── Selection ── */
+::selection {
+  background: var(--blue);
+  color: white;
+}
+
+/* ── Animations ── */
+@keyframes crtFlicker {
+  0% { opacity: 0.93; }
+  50% { opacity: 0.98; }
+  100% { opacity: 0.94; }
+}
+
+@keyframes wiggle {
+  0% { transform: translateY(0) rotate(0deg); }
+  20% { transform: translateY(-6px) rotate(-4deg); }
+  40% { transform: translateY(3px) rotate(3deg); }
+  60% { transform: translateY(-2px) rotate(-2deg); }
+  80% { transform: translateY(1px) rotate(1deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(2px, -2px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 1px); }
+  100% { transform: translate(0); }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  html, body, #root {
+    font-size: 12px;
+  }
+}

@@ -1,0 +1,1543 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Win95 Ultimate Edition</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23000080'/%3E%3Ctext x='8' y='11' font-size='8' text-anchor='middle' fill='%23ffffff' font-family='monospace'%3E95%3C/text%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --teal: #008080;
+      --silver: #c0c0c0;
+      --light: #ffffff;
+      --dark: #000000;
+      --mid: #808080;
+      --blue: #000080;
+      --font: "MS Sans Serif", "Courier New", system-ui, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      font-family: var(--font);
+      background: var(--teal);
+      overflow: hidden;
+    }
+
+    /* --- FIXED BOOT SCREEN CSS --- */
+    #boot {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Courier New", monospace;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 0.8s ease;
+      /* FAIL-SAFE: If JS crashes, this CSS animation hides the boot screen automatically */
+      animation: autoHideBoot 0.1s ease 3.8s forwards;
+    }
+
+    @keyframes autoHideBoot {
+      to {
+        opacity: 0;
+        pointer-events: none;
+        visibility: hidden;
+      }
+    }
+
+    #boot.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .boot-content {
+      width: min(560px, 90vw);
+    }
+
+    .boot-text {
+      font-size: 16px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      min-height: 48px; /* Prevents layout shift */
+    }
+
+    .progress-wrap {
+      margin-top: 14px;
+      border: 1px solid #fff;
+      padding: 6px;
+    }
+
+    .progress-bar {
+      font-family: "Courier New", monospace;
+      white-space: pre; /* Ensures spaces render correctly */
+    }
+
+    #active-desktop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      display: block;
+      background: transparent;
+      pointer-events: none;
+    }
+
+    #desktop {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      z-index: 1;
+      pointer-events: auto;
+    }
+
+    .crt-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2000;
+      background:
+        radial-gradient(circle at center, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.12) 55%, rgba(0, 0, 0, 0.35) 100%),
+        repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 0px, rgba(0, 0, 0, 0.15) 1px, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0) 4px);
+      animation: crtFlicker 0.12s infinite;
+    }
+
+    @keyframes crtFlicker {
+      0% { opacity: 0.93; }
+      50% { opacity: 0.98; }
+      100% { opacity: 0.94; }
+    }
+
+    #bsod {
+      position: fixed;
+      inset: 0;
+      background: #0000aa;
+      color: #fff;
+      font-family: "Courier New", monospace;
+      font-size: 16px;
+      display: none;
+      z-index: 10000;
+      padding: 40px;
+    }
+
+    #bsod.active {
+      display: block;
+    }
+
+    .icon {
+      width: 96px;
+      margin: 14px;
+      color: #fff;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .icon span {
+      display: block;
+      margin-top: 6px;
+      font-size: 12px;
+    }
+
+    .window {
+      position: absolute;
+      background: var(--silver);
+      min-width: 260px;
+      min-height: 180px;
+      resize: both;
+      overflow: auto;
+      pointer-events: auto;
+      box-shadow:
+        inset 1px 1px 0 var(--light),
+        inset -1px -1px 0 var(--mid),
+        inset -2px -2px 0 var(--dark),
+        inset 2px 2px 0 var(--light);
+    }
+
+    .window.hidden {
+      display: none;
+    }
+
+    .title-bar {
+      background: var(--blue);
+      color: #fff;
+      padding: 4px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: move;
+    }
+
+    .title-text {
+      font-size: 13px;
+    }
+
+    .title-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .btn {
+      background: var(--silver);
+      width: 20px;
+      height: 18px;
+      text-align: center;
+      line-height: 16px;
+      color: #000;
+      font-weight: bold;
+      user-select: none;
+      box-shadow:
+        inset 1px 1px 0 var(--light),
+        inset -1px -1px 0 var(--mid),
+        inset -2px -2px 0 var(--dark);
+    }
+
+    .btn:active {
+      box-shadow:
+        inset -1px -1px 0 var(--light),
+        inset 1px 1px 0 var(--mid),
+        inset 2px 2px 0 var(--dark);
+    }
+
+    .window-body {
+      padding: 10px;
+      font-size: 13px;
+    }
+
+    .status-inset {
+      margin-top: 10px;
+      padding: 6px;
+      background: #e0e0e0;
+      box-shadow:
+        inset 1px 1px 0 var(--dark),
+        inset -1px -1px 0 var(--light),
+        inset -2px -2px 0 var(--light),
+        inset 2px 2px 0 var(--mid);
+    }
+
+    .folder-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+    }
+
+    .folder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 6px;
+      text-align: center;
+    }
+
+    .folder .icon-box {
+      width: 38px;
+      height: 28px;
+      background: #f6d86b;
+      box-shadow:
+        inset 1px 1px 0 var(--light),
+        inset -1px -1px 0 var(--mid),
+        inset -2px -2px 0 var(--dark);
+    }
+
+    input, textarea, button {
+      font-family: var(--font);
+      font-size: 12px;
+    }
+
+    input, textarea {
+      width: 100%;
+      background: #fff;
+      padding: 6px;
+      box-shadow:
+        inset 1px 1px 0 var(--dark),
+        inset -1px -1px 0 var(--light),
+        inset -2px -2px 0 var(--light),
+        inset 2px 2px 0 var(--mid);
+      border: none;
+    }
+
+    button {
+      padding: 6px 12px;
+      background: var(--silver);
+      border: none;
+      box-shadow:
+        inset 1px 1px 0 var(--light),
+        inset -1px -1px 0 var(--mid),
+        inset -2px -2px 0 var(--dark);
+    }
+
+    button:active {
+      box-shadow:
+        inset -1px -1px 0 var(--light),
+        inset 1px 1px 0 var(--mid),
+        inset 2px 2px 0 var(--dark);
+    }
+
+    .amp-panel {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .amp-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .amp-display {
+      background: #000;
+      color: #00ff5a;
+      padding: 6px;
+      font-family: "Courier New", monospace;
+      box-shadow:
+        inset 1px 1px 0 var(--dark),
+        inset -1px -1px 0 var(--light),
+        inset -2px -2px 0 var(--light),
+        inset 2px 2px 0 var(--mid);
+    }
+
+    #visualizer {
+      width: 100%;
+      height: 110px;
+      background: #000;
+      display: block;
+    }
+
+    .browser-bar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .browser-frame {
+      width: 100%;
+      height: 220px;
+      border: none;
+      background: #fff;
+      box-shadow:
+        inset 1px 1px 0 var(--dark),
+        inset -1px -1px 0 var(--light),
+        inset -2px -2px 0 var(--light),
+        inset 2px 2px 0 var(--mid);
+    }
+
+    .video-frame {
+      width: 100%;
+      background: #000;
+      display: block;
+    }
+
+    .retro-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .todo-panel {
+      display: grid;
+      gap: 8px;
+    }
+
+    .todo-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    .todo-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px;
+      background: #e0e0e0;
+      box-shadow:
+        inset 1px 1px 0 var(--light),
+        inset -1px -1px 0 var(--mid),
+        inset -2px -2px 0 var(--dark);
+    }
+
+    .paint-toolbar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    #paintCanvas {
+      width: 100%;
+      height: 220px;
+      background: #fff;
+      display: block;
+      box-shadow:
+        inset 1px 1px 0 var(--dark),
+        inset -1px -1px 0 var(--light),
+        inset -2px -2px 0 var(--light),
+        inset 2px 2px 0 var(--mid);
+    }
+
+    #clippy {
+      position: fixed;
+      right: 14px;
+      bottom: 60px;
+      z-index: 3000;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    #clippy .bubble {
+      background: var(--silver);
+      padding: 8px 10px;
+      width: 220px;
+      box-shadow:
+        inset 1px 1px 0 var(--light),
+        inset -1px -1px 0 var(--mid),
+        inset -2px -2px 0 var(--dark);
+      font-size: 12px;
+    }
+
+    #clippy .paperclip {
+      width: 32px;
+      height: 32px;
+      background: var(--silver);
+      display: grid;
+      place-items: center;
+      box-shadow:
+        inset 1px 1px 0 var(--light),
+        inset -1px -1px 0 var(--mid),
+        inset -2px -2px 0 var(--dark);
+    }
+
+    #clippy.wiggle {
+      animation: wiggle 0.6s ease;
+    }
+
+    @keyframes wiggle {
+      0% { transform: translateY(0) rotate(0deg); }
+      30% { transform: translateY(-4px) rotate(-3deg); }
+      60% { transform: translateY(2px) rotate(2deg); }
+      100% { transform: translateY(0) rotate(0deg); }
+    }
+
+    #taskbar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 40px;
+      background: var(--silver);
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      gap: 6px;
+      box-shadow:
+        inset 1px 1px 0 var(--light),
+        inset -1px -1px 0 var(--mid),
+        inset -2px -2px 0 var(--dark);
+    }
+
+    .start-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--silver);
+      cursor: pointer;
+      box-shadow:
+        inset 1px 1px 0 var(--light),
+        inset -1px -1px 0 var(--mid),
+        inset -2px -2px 0 var(--dark);
+    }
+
+    .start-btn.active {
+      box-shadow:
+        inset -1px -1px 0 var(--light),
+        inset 1px 1px 0 var(--mid),
+        inset 2px 2px 0 var(--dark);
+    }
+
+    .win-logo {
+      width: 16px;
+      height: 12px;
+      background: linear-gradient(90deg, #ff0000 50%, #00a2ff 50%);
+      position: relative;
+    }
+
+    .win-logo::before,
+    .win-logo::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 16px;
+      height: 6px;
+    }
+
+    .win-logo::before {
+      top: 0;
+      background: linear-gradient(90deg, #00ff00 50%, #ffff00 50%);
+    }
+
+    .win-logo::after {
+      bottom: 0;
+      background: linear-gradient(90deg, #ff0000 50%, #00a2ff 50%);
+    }
+
+    #start-menu {
+      position: absolute;
+      bottom: 44px;
+      left: 4px;
+      width: 200px;
+      background: var(--silver);
+      padding: 6px;
+      display: none;
+      box-shadow:
+        inset 1px 1px 0 var(--light),
+        inset -1px -1px 0 var(--mid),
+        inset -2px -2px 0 var(--dark);
+    }
+
+    #start-menu.active {
+      display: block;
+    }
+
+    #start-menu .menu-item {
+      padding: 6px;
+      background: #e0e0e0;
+      margin-bottom: 6px;
+      box-shadow:
+        inset 1px 1px 0 var(--light),
+        inset -1px -1px 0 var(--mid),
+        inset -2px -2px 0 var(--dark);
+      cursor: pointer;
+    }
+
+    .task-buttons {
+      display: flex;
+      gap: 6px;
+      flex: 1;
+      overflow-x: auto;
+    }
+
+    .task-btn {
+      padding: 4px 10px;
+      background: var(--silver);
+      min-width: 100px;
+      box-shadow:
+        inset 1px 1px 0 var(--light),
+        inset -1px -1px 0 var(--mid),
+        inset -2px -2px 0 var(--dark);
+    }
+
+    .task-btn.active {
+      box-shadow:
+        inset -1px -1px 0 var(--light),
+        inset 1px 1px 0 var(--mid),
+        inset 2px 2px 0 var(--dark);
+    }
+
+    #clock {
+      padding: 4px 8px;
+      background: #e0e0e0;
+      font-size: 12px;
+      box-shadow:
+        inset 1px 1px 0 var(--dark),
+        inset -1px -1px 0 var(--light),
+        inset -2px -2px 0 var(--light),
+        inset 2px 2px 0 var(--mid);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .window {
+      animation: fadeInUp 0.4s ease;
+    }
+
+    @media (max-width: 640px) {
+      .window { width: 90vw; height: 60vh; }
+      .icon { width: 80px; margin: 10px; }
+      #taskbar { height: 44px; }
+      #clippy { bottom: 70px; right: 8px; }
+      #paintCanvas { height: 180px; }
+      .browser-frame { height: 180px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="boot">
+    <div class="boot-content">
+      <div class="boot-text" id="bootText"></div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="active-desktop" aria-hidden="true"></canvas>
+
+  <div id="bsod">
+    FATAL EXCEPTION 0E at 0028:C0011E36<br />
+    Press any key to continue...
+  </div>
+
+  <div id="desktop">
+    <div class="icon" data-open="about" style="position:absolute; top:20px; left:20px;">
+      <div>[PC]</div>
+      <span>My Computer (About)</span>
+    </div>
+    <div class="icon" data-open="projects" style="position:absolute; top:120px; left:20px;">
+      <div>[DIR]</div>
+      <span>Projects</span>
+    </div>
+    <div class="icon" data-open="skills" style="position:absolute; top:220px; left:20px;">
+      <div>[SKL]</div>
+      <span>Skills</span>
+    </div>
+    <div class="icon" data-open="contact" style="position:absolute; top:320px; left:20px;">
+      <div>[MSG]</div>
+      <span>Contact</span>
+    </div>
+    <div class="icon" data-open="grooveamp" style="position:absolute; top:420px; left:20px;">
+      <div>[AMP]</div>
+      <span>GrooveAmp.exe</span>
+    </div>
+    <div class="icon" data-open="netscape" style="position:absolute; top:20px; left:140px;">
+      <div>[WWW]</div>
+      <span>NetScape Navigator</span>
+    </div>
+    <div class="icon" data-open="cinema" style="position:absolute; top:120px; left:140px;">
+      <div>[VID]</div>
+      <span>Cinema95</span>
+    </div>
+    <div class="icon" data-open="taskmaster" style="position:absolute; top:220px; left:140px;">
+      <div>[TODO]</div>
+      <span>TaskMaster</span>
+    </div>
+    <div class="icon" data-open="paint" style="position:absolute; top:320px; left:140px;">
+      <div>[PAINT]</div>
+      <span>Paint.exe</span>
+    </div>
+
+    <div class="window hidden" id="win-about" data-title="About" style="top:60px; left:260px; width:380px; height:240px;">
+      <div class="title-bar" data-drag>
+        <div class="title-text">My Computer (About)</div>
+        <div class="title-actions">
+          <div class="btn" data-close>X</div>
+        </div>
+      </div>
+      <div class="window-body">
+        <p>Hi, I'm a creative front-end developer who loves turning interfaces into nostalgic, playful experiences. I build retro-inspired sites with modern performance and accessible interactions.</p>
+        <div class="status-inset">Status: Online • Mode: 1995</div>
+        <div style="margin-top:10px;">
+          <button id="bsodTrigger">Don't Click Me</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="window hidden" id="win-projects" data-title="Projects" style="top:120px; left:320px; width:420px; height:260px;">
+      <div class="title-bar" data-drag>
+        <div class="title-text">Projects</div>
+        <div class="title-actions">
+          <div class="btn" data-close>X</div>
+        </div>
+      </div>
+      <div class="window-body">
+        <div class="folder-list">
+          <div class="folder">
+            <div class="icon-box"></div>
+            <div>CRT Arcade</div>
+          </div>
+          <div class="folder">
+            <div class="icon-box"></div>
+            <div>Pixel CMS</div>
+          </div>
+          <div class="folder">
+            <div class="icon-box"></div>
+            <div>Neon Notes</div>
+          </div>
+          <div class="folder">
+            <div class="icon-box"></div>
+            <div>Retro Shop</div>
+          </div>
+        </div>
+        <div class="status-inset">Double-click to open (simulation)</div>
+      </div>
+    </div>
+
+    <div class="window hidden" id="win-skills" data-title="Skills" style="top:170px; left:280px; width:360px; height:220px;">
+      <div class="title-bar" data-drag>
+        <div class="title-text">Skills</div>
+        <div class="title-actions">
+          <div class="btn" data-close>X</div>
+        </div>
+      </div>
+      <div class="window-body">
+        <ul>
+          <li>HTML5, CSS3, Vanilla JS</li>
+          <li>Retro UI/UX Design Systems</li>
+          <li>Micro-animations & Interaction Design</li>
+          <li>Accessibility & Responsive Layouts</li>
+        </ul>
+        <div class="status-inset">Toolset: Win95 Toolkit v1.0</div>
+      </div>
+    </div>
+
+    <div class="window hidden" id="win-contact" data-title="Contact" style="top:200px; left:360px; width:420px; height:280px;">
+      <div class="title-bar" data-drag>
+        <div class="title-text">Contact</div>
+        <div class="title-actions">
+          <div class="btn" data-close>X</div>
+        </div>
+      </div>
+      <div class="window-body">
+        <form id="contactForm">
+          <label>Name</label>
+          <input type="text" required />
+          <label>Email</label>
+          <input type="email" required />
+          <label>Message</label>
+          <textarea rows="4" required></textarea>
+          <div style="margin-top:10px; display:flex; gap:8px;">
+            <button type="submit">Send</button>
+            <div class="status-inset" style="flex:1;">Ready to transmit...</div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="window hidden" id="win-grooveamp" data-title="GrooveAmp" style="top:140px; left:430px; width:360px; height:240px;">
+      <div class="title-bar" data-drag>
+        <div class="title-text">GrooveAmp.exe</div>
+        <div class="title-actions">
+          <div class="btn" data-close>X</div>
+        </div>
+      </div>
+      <div class="window-body">
+        <div class="amp-panel">
+          <div class="amp-display">Now Playing: 8-Bit Breeze</div>
+          <canvas id="visualizer" width="320" height="110"></canvas>
+          <div class="amp-controls">
+            <button id="playAmp">Play</button>
+            <button id="stopAmp">Stop</button>
+            <div class="status-inset" style="flex:1;">Status: Idle</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="window hidden" id="win-netscape" data-title="NetScape" style="top:70px; left:560px; width:420px; height:320px;">
+      <div class="title-bar" data-drag>
+        <div class="title-text">NetScape Navigator</div>
+        <div class="title-actions">
+          <div class="btn" data-close>X</div>
+        </div>
+      </div>
+      <div class="window-body">
+        <div class="browser-bar">
+          <input id="addressBar" type="text" value="Search Portal" aria-label="Address bar" />
+          <button id="goBtn">Go</button>
+        </div>
+        <iframe id="browserFrame" class="browser-frame" title="NetScape Navigator"></iframe>
+      </div>
+    </div>
+
+    <div class="window hidden" id="win-cinema" data-title="Cinema95" style="top:120px; left:520px; width:420px; height:320px;">
+      <div class="title-bar" data-drag>
+        <div class="title-text">Cinema95</div>
+        <div class="title-actions">
+          <div class="btn" data-close>X</div>
+        </div>
+      </div>
+      <div class="window-body">
+        <video id="cinemaVideo" class="video-frame" width="100%" height="200" preload="metadata">
+          <source src="https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4" type="video/mp4" />
+        </video>
+        <div class="retro-controls">
+          <button id="videoPlay">Play</button>
+          <button id="videoPause">Pause</button>
+          <button id="videoStop">Stop</button>
+          <button id="videoVolDown">Vol -</button>
+          <button id="videoVolUp">Vol +</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="window hidden" id="win-taskmaster" data-title="TaskMaster" style="top:200px; left:520px; width:360px; height:300px;">
+      <div class="title-bar" data-drag>
+        <div class="title-text">TaskMaster</div>
+        <div class="title-actions">
+          <div class="btn" data-close>X</div>
+        </div>
+      </div>
+      <div class="window-body">
+        <div class="todo-panel">
+          <div style="display:flex; gap:6px;">
+            <input id="todoInput" type="text" placeholder="Add a task" />
+            <button id="todoAdd">Add</button>
+          </div>
+          <ul id="todoList" class="todo-list"></ul>
+          <div class="status-inset">Saved locally</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="window hidden" id="win-paint" data-title="Paint" style="top:240px; left:240px; width:420px; height:320px;">
+      <div class="title-bar" data-drag>
+        <div class="title-text">Paint.exe</div>
+        <div class="title-actions">
+          <div class="btn" data-close>X</div>
+        </div>
+      </div>
+      <div class="window-body">
+        <div class="paint-toolbar">
+          <button id="toolPencil">Pencil</button>
+          <button id="toolEraser">Eraser</button>
+          <button id="toolClear">Clear All</button>
+        </div>
+        <canvas id="paintCanvas" width="360" height="220"></canvas>
+      </div>
+    </div>
+
+    <div id="taskbar">
+      <div class="start-btn" id="startBtn">
+        <div class="win-logo"></div><strong>Start</strong>
+      </div>
+      <div class="task-buttons" id="taskButtons"></div>
+      <div id="clock"></div>
+    </div>
+    <div id="start-menu">
+      <div class="menu-item" data-open="about">About</div>
+      <div class="menu-item" data-open="projects">Projects</div>
+      <div class="menu-item" data-open="skills">Skills</div>
+      <div class="menu-item" data-open="contact">Contact</div>
+      <div class="menu-item" data-open="grooveamp">GrooveAmp</div>
+      <div class="menu-item" data-open="netscape">NetScape</div>
+      <div class="menu-item" data-open="cinema">Cinema95</div>
+      <div class="menu-item" data-open="taskmaster">TaskMaster</div>
+      <div class="menu-item" data-open="paint">Paint.exe</div>
+    </div>
+  </div>
+
+  <div class="crt-overlay"></div>
+
+  <div id="clippy">
+    <div class="bubble" id="clippyBubble">Hi! I'm Clippy. Need a hand?</div>
+    <div class="paperclip">[CL]</div>
+  </div>
+
+  <script>
+    // Failsafe window manager: keeps app icons/windows usable even if later scripts fail.
+    (() => {
+      const windows = Array.from(document.querySelectorAll('.window'));
+      const taskButtons = document.getElementById('taskButtons');
+      let zCounter = 20;
+      let dragTarget = null;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      function updateTaskButtonsFallback() {
+        if (!taskButtons) return;
+        taskButtons.innerHTML = '';
+        windows.forEach(win => {
+          if (!win.classList.contains('hidden')) {
+            const id = win.id.replace('win-', '');
+            const btn = document.createElement('div');
+            btn.className = 'task-btn active';
+            btn.textContent = win.dataset.title || id;
+            btn.dataset.taskOpen = id;
+            taskButtons.appendChild(btn);
+          }
+        });
+      }
+
+      function focusWindowFallback(win) {
+        if (!win) return;
+        zCounter++;
+        win.style.zIndex = zCounter;
+        updateTaskButtonsFallback();
+      }
+
+      function openWindowFallback(id) {
+        if (!id) return;
+        const win = document.getElementById('win-' + id);
+        if (!win) return;
+        win.classList.remove('hidden');
+        focusWindowFallback(win);
+      }
+
+      function closeWindowFallback(win) {
+        if (!win) return;
+        if (win.id === 'win-cinema') {
+          const video = document.getElementById('cinemaVideo');
+          if (video) {
+            video.pause();
+            video.currentTime = 0;
+          }
+        }
+        win.classList.add('hidden');
+        updateTaskButtonsFallback();
+      }
+
+      document.addEventListener('click', (e) => {
+        const target = e.target instanceof Element ? e.target : null;
+        if (!target) return;
+
+        const closeBtn = target.closest('[data-close]');
+        if (closeBtn) {
+          const win = closeBtn.closest('.window');
+          closeWindowFallback(win);
+          return;
+        }
+
+        const launcher = target.closest('[data-open]');
+        if (launcher) {
+          openWindowFallback(launcher.dataset.open);
+          return;
+        }
+
+        const taskBtn = target.closest('[data-task-open]');
+        if (taskBtn) {
+          openWindowFallback(taskBtn.dataset.taskOpen);
+        }
+      });
+
+      document.addEventListener('mousedown', (e) => {
+        const target = e.target instanceof Element ? e.target : null;
+        if (!target) return;
+        if (target.closest('[data-close]')) return;
+
+        const bar = target.closest('[data-drag]');
+        if (!bar) return;
+        dragTarget = bar.closest('.window');
+        if (!dragTarget) return;
+
+        focusWindowFallback(dragTarget);
+        const rect = dragTarget.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!dragTarget) return;
+        dragTarget.style.left = (e.clientX - offsetX) + 'px';
+        dragTarget.style.top = (e.clientY - offsetY) + 'px';
+      });
+
+      document.addEventListener('mouseup', () => {
+        dragTarget = null;
+      });
+
+      window.openRetroWindow = openWindowFallback;
+      updateTaskButtonsFallback();
+      openWindowFallback('about');
+    })();
+  </script>
+
+  <script>
+    const boot = document.getElementById('boot');
+    window.onerror = function (msg, url, line, col, error) {
+      console.error("System Error: " + msg + "\nLine: " + line);
+      // Ensure boot screen hides on error so user isn't stuck
+      if (boot) boot.classList.add('hidden');
+    };
+
+    // Scheduled system load - moved up to ensure it runs even if other code crashes
+    setTimeout(() => {
+      if (boot) boot.classList.add('hidden');
+    }, 3200);
+
+    const bootText = document.getElementById('bootText');
+    const progressBar = document.getElementById('progressBar');
+    const bootLines = "C:\\> BOOT.EXE...\nLoading System...";
+    let charIndex = 0;
+
+    function typeBoot() {
+      if (!bootText) return; // Safety check
+      if (charIndex <= bootLines.length) {
+        bootText.textContent = bootLines.slice(0, charIndex);
+        charIndex++;
+        setTimeout(typeBoot, 50);
+      }
+    }
+
+    typeBoot();
+
+    let blocks = 0;
+    const totalBlocks = 18;
+    const interval = setInterval(() => {
+      if (!progressBar) return;
+      blocks++;
+      // FIXED: Prevents negative repeat count error if logic glitched
+      const safeSpaces = Math.max(0, totalBlocks - blocks);
+      const safeBars = Math.max(0, blocks);
+      progressBar.textContent = "[" + "|".repeat(safeBars) + " ".repeat(safeSpaces) + "]";
+      if (blocks >= totalBlocks) {
+        clearInterval(interval);
+      }
+    }, 160);
+
+    const windows = Array.from(document.querySelectorAll('.window'));
+    const taskButtons = document.getElementById('taskButtons');
+    let zCounter = 10;
+    const clippy = document.getElementById('clippy');
+    const clippyBubble = document.getElementById('clippyBubble');
+    const bsod = document.getElementById('bsod');
+
+    function focusWindow(win) {
+      zCounter++;
+      win.style.zIndex = zCounter;
+      updateTaskButtons();
+    }
+
+    function updateTaskButtons() {
+      if (!taskButtons) return;
+      taskButtons.innerHTML = '';
+      windows.forEach(win => {
+        if (!win.classList.contains('hidden')) {
+          const btn = document.createElement('div');
+          btn.className = 'task-btn active';
+          btn.textContent = win.dataset.title;
+          btn.onclick = () => {
+            win.classList.remove('hidden');
+            focusWindow(win);
+          };
+          taskButtons.appendChild(btn);
+        }
+      });
+    }
+
+    function stopCinemaIfNeeded(win) {
+      if (win.id !== 'win-cinema') return;
+      const video = document.getElementById('cinemaVideo');
+      if (video) {
+        video.pause();
+        video.currentTime = 0;
+      }
+    }
+
+    windows.forEach(win => {
+      win.addEventListener('mousedown', () => focusWindow(win));
+      const closeBtn = win.querySelector('[data-close]');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          stopCinemaIfNeeded(win);
+          win.classList.add('hidden');
+          showClippyMessage("I'll save that for later.");
+          updateTaskButtons();
+        });
+      }
+    });
+
+    let dragTarget = null;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    document.addEventListener('mousedown', (e) => {
+      const target = e.target instanceof Element ? e.target : null;
+      if (!target) return;
+      // Let control buttons handle their own click actions.
+      if (target.closest('[data-close]')) return;
+      const bar = target.closest('[data-drag]');
+      if (!bar) return;
+      dragTarget = bar.parentElement;
+      focusWindow(dragTarget);
+      const rect = dragTarget.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!dragTarget) return;
+      dragTarget.style.left = (e.clientX - offsetX) + 'px';
+      dragTarget.style.top = (e.clientY - offsetY) + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+      dragTarget = null;
+    });
+
+    function openWindow(id) {
+      const win = document.getElementById('win-' + id);
+      if (!win) return;
+      win.classList.remove('hidden');
+      focusWindow(win);
+      updateTaskButtons();
+      if (id === 'contact') {
+        showClippyMessage("It looks like you're trying to send an email. Would you like some help?");
+      }
+    }
+
+    document.querySelectorAll('[data-open]').forEach(el => {
+      el.addEventListener('click', () => openWindow(el.dataset.open));
+    });
+
+    // Start with only one app window open so desktop controls are accessible.
+    openWindow('about');
+
+    const startBtn = document.getElementById('startBtn');
+    const startMenu = document.getElementById('start-menu');
+
+    if (startBtn && startMenu) {
+      startBtn.addEventListener('click', () => {
+        startMenu.classList.toggle('active');
+        startBtn.classList.toggle('active');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!startMenu.contains(e.target) && !startBtn.contains(e.target)) {
+          startMenu.classList.remove('active');
+          startBtn.classList.remove('active');
+        }
+      });
+    }
+
+    function updateClock() {
+      const clockEl = document.getElementById('clock');
+      if (!clockEl) return;
+      const now = new Date();
+      const h = now.getHours();
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const hour = h % 12 || 12;
+      clockEl.textContent = hour + ':' + m + ' ' + ampm;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    function showClippyMessage(msg) {
+      if (clippyBubble) clippyBubble.textContent = msg;
+    }
+
+    setInterval(() => {
+      if (clippy) {
+        clippy.classList.add('wiggle');
+        setTimeout(() => clippy.classList.remove('wiggle'), 700);
+      }
+    }, 10000);
+
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+      contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Sent to server!');
+        contactForm.reset();
+      });
+    }
+
+    const bsodTrigger = document.getElementById('bsodTrigger');
+    if (bsodTrigger) {
+      bsodTrigger.addEventListener('click', () => {
+        document.getElementById('desktop').style.display = 'none';
+        bsod.classList.add('active');
+      });
+    }
+
+    document.addEventListener('keydown', () => {
+      if (bsod && bsod.classList.contains('active')) {
+        location.reload();
+      }
+    });
+
+    const playBtn = document.getElementById('playAmp');
+    const stopBtn = document.getElementById('stopAmp');
+    const ampStatus = document.querySelector('#win-grooveamp .status-inset');
+    let audioCtx = null;
+    let osc = null;
+    let gainNode = null;
+    let melodyTimer = null;
+
+    function startMelody() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (osc) return;
+      osc = audioCtx.createOscillator();
+      gainNode = audioCtx.createGain();
+      osc.type = 'square';
+      gainNode.gain.value = 0.05;
+      osc.connect(gainNode).connect(audioCtx.destination);
+      osc.start();
+      const scale = [262, 294, 330, 392, 440, 523, 494, 392];
+      let idx = 0;
+      if (ampStatus) ampStatus.textContent = 'Status: Playing';
+      melodyTimer = setInterval(() => {
+        if (!osc) return;
+        osc.frequency.setValueAtTime(scale[idx % scale.length], audioCtx.currentTime);
+        idx++;
+      }, 180);
+    }
+
+    function stopMelody() {
+      if (melodyTimer) clearInterval(melodyTimer);
+      melodyTimer = null;
+      if (osc) {
+        osc.stop();
+        osc.disconnect();
+        osc = null;
+      }
+      if (ampStatus) ampStatus.textContent = 'Status: Idle';
+    }
+
+    if (playBtn) playBtn.addEventListener('click', startMelody);
+    if (stopBtn) stopBtn.addEventListener('click', stopMelody);
+
+    const visualizerCanvas = document.getElementById('visualizer');
+    if (visualizerCanvas) {
+        const vctx = visualizerCanvas.getContext('2d');
+        let visualizerAnimation = null;
+        let visualizerLastFrame = 0;
+
+        function drawVisualizer(ts = 0) {
+          if (!vctx) return;
+          // Draw at ~12 FPS to keep CPU usage low on slower devices.
+          if (ts - visualizerLastFrame < 80) {
+            visualizerAnimation = requestAnimationFrame(drawVisualizer);
+            return;
+          }
+          visualizerLastFrame = ts;
+          const w = visualizerCanvas.width;
+          const h = visualizerCanvas.height;
+          vctx.fillStyle = '#000';
+          vctx.fillRect(0, 0, w, h);
+          const bars = 24;
+          const barW = (w - 20) / bars;
+          for (let i = 0; i < bars; i++) {
+            const barH = Math.random() * (h - 12) + 6;
+            const x = 10 + i * barW;
+            vctx.fillStyle = '#00ff5a';
+            vctx.fillRect(x, h - barH, barW - 2, barH);
+          }
+          visualizerAnimation = requestAnimationFrame(drawVisualizer);
+        }
+
+        function startVisualizer() {
+          if (!visualizerAnimation) {
+            visualizerAnimation = requestAnimationFrame(drawVisualizer);
+          }
+        }
+
+        function stopVisualizer() {
+          if (visualizerAnimation) {
+            cancelAnimationFrame(visualizerAnimation);
+            visualizerAnimation = null;
+          }
+        }
+
+        startVisualizer();
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) stopVisualizer();
+          else startVisualizer();
+        });
+    }
+
+    const browserFrame = document.getElementById('browserFrame');
+    const addressBar = document.getElementById('addressBar');
+    const goBtn = document.getElementById('goBtn');
+
+    const portalHTML = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  body { margin: 0; font-family: "MS Sans Serif", Arial, sans-serif; background: #c0c0c0; }
+  .wrap { padding: 16px; }
+  h1 { font-size: 16px; margin: 0 0 10px; }
+  input { width: 100%; padding: 8px; font-size: 12px; }
+  button { margin-top: 8px; padding: 6px 10px; }
+  .note { margin-top: 10px; font-size: 11px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Retro Search Portal</h1>
+    <form action="https://en.wikipedia.org/wiki/Special:Search" method="get">
+      <input name="search" placeholder="Search Wikipedia..." />
+      <button type="submit">Search</button>
+    </form>
+    <div class="note">Tip: Searches redirect to Wikipedia inside this frame.</div>
+  </div>
+</body>
+</html>`;
+
+    function loadPortal() {
+      if (!browserFrame) return;
+      if ('srcdoc' in browserFrame) {
+        browserFrame.srcdoc = portalHTML;
+        browserFrame.removeAttribute('src');
+      } else {
+        browserFrame.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(portalHTML);
+      }
+      if (addressBar) addressBar.value = 'Search Portal';
+    }
+
+    function navigateBrowser() {
+      if (!browserFrame || !addressBar) return;
+      const value = addressBar.value.trim();
+      if (!value || value === 'Search Portal') {
+        loadPortal();
+        return;
+      }
+      if (value.toLowerCase().includes('google.com')) {
+        alert('Google blocks iframes. Try Wikipedia or another site.');
+        return;
+      }
+      const hasProtocol = /^https?:\/\//i.test(value) || value.startsWith('data:');
+      browserFrame.src = hasProtocol ? value : ('https://' + value);
+    }
+
+    if (goBtn) goBtn.addEventListener('click', navigateBrowser);
+    if (addressBar) {
+      addressBar.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          navigateBrowser();
+        }
+      });
+    }
+
+    loadPortal();
+
+    const cinemaVideo = document.getElementById('cinemaVideo');
+    const videoPlay = document.getElementById('videoPlay');
+    const videoPause = document.getElementById('videoPause');
+    const videoStop = document.getElementById('videoStop');
+    const videoVolDown = document.getElementById('videoVolDown');
+    const videoVolUp = document.getElementById('videoVolUp');
+
+    if (cinemaVideo && videoPlay && videoPause && videoStop && videoVolDown && videoVolUp) {
+        videoPlay.addEventListener('click', () => cinemaVideo.play());
+        videoPause.addEventListener('click', () => cinemaVideo.pause());
+        videoStop.addEventListener('click', () => {
+          cinemaVideo.pause();
+          cinemaVideo.currentTime = 0;
+        });
+        videoVolDown.addEventListener('click', () => {
+          cinemaVideo.volume = Math.max(0, Math.round((cinemaVideo.volume - 0.1) * 10) / 10);
+        });
+        videoVolUp.addEventListener('click', () => {
+          cinemaVideo.volume = Math.min(1, Math.round((cinemaVideo.volume + 0.1) * 10) / 10);
+        });
+    }
+
+    const todoInput = document.getElementById('todoInput');
+    const todoAdd = document.getElementById('todoAdd');
+    const todoList = document.getElementById('todoList');
+    const todoKey = 'win95-taskmaster';
+
+    function loadTodos() {
+      if (!todoList) return;
+      let stored = [];
+      try {
+        // FIXED: Wrap JSON.parse in try-catch to prevent crash from bad data
+        const raw = localStorage.getItem(todoKey);
+        if (raw) stored = JSON.parse(raw);
+      } catch (e) {
+        console.warn("Could not load todos", e);
+      }
+      todoList.innerHTML = '';
+      stored.forEach(item => renderTodo(item));
+    }
+
+    function saveTodos() {
+      if (!todoList) return;
+      const items = Array.from(todoList.querySelectorAll('li')).map(li => li.dataset.text);
+      localStorage.setItem(todoKey, JSON.stringify(items));
+    }
+
+    function renderTodo(text) {
+      const li = document.createElement('li');
+      li.className = 'todo-item';
+      li.dataset.text = text;
+      li.innerHTML = '<span>' + text + '</span>';
+      const del = document.createElement('button');
+      del.textContent = 'X';
+      del.addEventListener('click', () => {
+        li.remove();
+        saveTodos();
+      });
+      li.appendChild(del);
+      todoList.appendChild(li);
+    }
+
+    function addTodo() {
+      if (!todoInput) return;
+      const text = todoInput.value.trim();
+      if (!text) return;
+      renderTodo(text);
+      todoInput.value = '';
+      saveTodos();
+    }
+
+    if (todoAdd) todoAdd.addEventListener('click', addTodo);
+    if (todoInput) {
+      todoInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addTodo();
+        }
+      });
+    }
+
+    loadTodos();
+
+    const paintCanvas = document.getElementById('paintCanvas');
+    if (paintCanvas) {
+        const pctx = paintCanvas.getContext('2d');
+        let drawing = false;
+        let paintColor = '#000';
+
+        function syncPaintSize() {
+          const rect = paintCanvas.getBoundingClientRect();
+          paintCanvas.width = Math.floor(rect.width);
+          paintCanvas.height = Math.floor(rect.height);
+          pctx.fillStyle = '#fff';
+          pctx.fillRect(0, 0, paintCanvas.width, paintCanvas.height);
+        }
+
+        function getPaintPos(e) {
+          const rect = paintCanvas.getBoundingClientRect();
+          return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        }
+
+        paintCanvas.addEventListener('mousedown', (e) => {
+          drawing = true;
+          pctx.beginPath();
+          const pos = getPaintPos(e);
+          pctx.moveTo(pos.x, pos.y);
+        });
+
+        paintCanvas.addEventListener('mousemove', (e) => {
+          if (!drawing) return;
+          const pos = getPaintPos(e);
+          pctx.lineTo(pos.x, pos.y);
+          pctx.strokeStyle = paintColor;
+          pctx.lineWidth = 2;
+          pctx.lineCap = 'round';
+          pctx.stroke();
+        });
+
+        document.addEventListener('mouseup', () => {
+          drawing = false;
+        });
+
+        paintCanvas.addEventListener('mouseleave', () => {
+          drawing = false;
+        });
+
+        const btnPencil = document.getElementById('toolPencil');
+        if(btnPencil) btnPencil.addEventListener('click', () => {
+          paintColor = '#000';
+        });
+
+        const btnEraser = document.getElementById('toolEraser');
+        if(btnEraser) btnEraser.addEventListener('click', () => {
+          paintColor = '#fff';
+        });
+
+        const btnClear = document.getElementById('toolClear');
+        if(btnClear) btnClear.addEventListener('click', () => {
+          pctx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+          pctx.fillStyle = '#fff';
+          pctx.fillRect(0, 0, paintCanvas.width, paintCanvas.height);
+        });
+
+        syncPaintSize();
+        window.addEventListener('resize', syncPaintSize);
+    }
+
+    const matrixCanvas = document.getElementById('active-desktop');
+    if (matrixCanvas) {
+        const mctx = matrixCanvas.getContext('2d');
+        let matrixAnimation = null;
+        let matrixRunning = true;
+        let matrixLastFrame = 0;
+        let matrixColumns = [];
+        let matrixWidth = 0;
+        let matrixHeight = 0;
+        const matrixFontSize = 16;
+
+        function resizeMatrix() {
+          matrixWidth = matrixCanvas.width = window.innerWidth;
+          matrixHeight = matrixCanvas.height = window.innerHeight;
+          const columns = Math.floor(matrixWidth / matrixFontSize);
+          if (columns > 0) {
+             matrixColumns = Array.from({ length: columns }, () => Math.floor(Math.random() * matrixHeight));
+          }
+        }
+
+        function drawMatrix(ts = 0) {
+          if (!matrixRunning) return;
+          // Draw at ~20 FPS to reduce GPU/CPU spikes.
+          if (ts - matrixLastFrame < 50) {
+            matrixAnimation = requestAnimationFrame(drawMatrix);
+            return;
+          }
+          matrixLastFrame = ts;
+          mctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+          mctx.fillRect(0, 0, matrixWidth, matrixHeight);
+          mctx.fillStyle = '#00ff66';
+          mctx.font = matrixFontSize + 'px "Courier New", monospace';
+          for (let i = 0; i < matrixColumns.length; i++) {
+            const charCode = 0x30A0 + Math.floor(Math.random() * 96);
+            const text = String.fromCharCode(charCode);
+            const x = i * matrixFontSize;
+            const y = matrixColumns[i] * matrixFontSize;
+            mctx.fillText(text, x, y);
+            if (y > matrixHeight && Math.random() > 0.975) {
+              matrixColumns[i] = 0;
+            } else {
+              matrixColumns[i]++;
+            }
+          }
+          matrixAnimation = requestAnimationFrame(drawMatrix);
+        }
+
+        function startMatrix() {
+          matrixRunning = true;
+          if (!matrixAnimation) drawMatrix();
+        }
+
+        function stopMatrix() {
+          matrixRunning = false;
+          if (matrixAnimation) {
+            cancelAnimationFrame(matrixAnimation);
+            matrixAnimation = null;
+          }
+        }
+
+        resizeMatrix();
+        drawMatrix();
+        window.addEventListener('resize', resizeMatrix);
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            stopMatrix();
+          } else {
+            startMatrix();
+          }
+        });
+    }
+
+    updateTaskButtons();
+  </script>
+</body>
+
+</html>

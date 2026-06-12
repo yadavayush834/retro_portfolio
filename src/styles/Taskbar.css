@@ -1,0 +1,195 @@
+/* ═══════════════════════════
+   Taskbar Styles
+   ═══════════════════════════ */
+
+.taskbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 44px;
+  background: var(--silver);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  gap: 6px;
+  z-index: 5000;
+  box-shadow:
+    inset 0 1px 0 var(--light),
+    0 -1px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* ── Start Button ── */
+.start-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: var(--silver);
+  cursor: pointer;
+  box-shadow: var(--shadow-btn);
+  user-select: none;
+  font-weight: bold;
+  font-size: 13px;
+  transition: filter 0.1s;
+  flex-shrink: 0;
+}
+
+.start-btn:hover {
+  filter: brightness(1.05);
+}
+
+.start-btn.active {
+  box-shadow: var(--shadow-btn-pressed);
+}
+
+.win-logo {
+  width: 18px;
+  height: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1px;
+}
+
+.win-logo-r { background: #ff0000; }
+.win-logo-g { background: #00a000; }
+.win-logo-b { background: #0000ff; }
+.win-logo-y { background: #ffff00; }
+
+/* ── Task Buttons ── */
+.task-buttons {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  overflow-x: auto;
+  min-width: 0;
+}
+
+.task-btn {
+  padding: 4px 12px;
+  background: var(--silver);
+  min-width: 100px;
+  max-width: 160px;
+  box-shadow: var(--shadow-btn);
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: box-shadow 0.05s;
+}
+
+.task-btn.active {
+  box-shadow: var(--shadow-btn-pressed);
+  font-weight: bold;
+}
+
+.task-btn:hover {
+  filter: brightness(1.05);
+}
+
+/* ── Clock ── */
+.clock {
+  padding: 4px 10px;
+  background: #e0e0e0;
+  font-size: 12px;
+  box-shadow: var(--shadow-inset);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Start Menu ── */
+.start-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 4999;
+}
+
+.start-menu {
+  position: fixed;
+  bottom: 48px;
+  left: 4px;
+  width: 220px;
+  background: var(--silver);
+  z-index: 5001;
+  box-shadow:
+    inset 1px 1px 0 var(--light),
+    inset -1px -1px 0 var(--mid),
+    inset -2px -2px 0 var(--dark),
+    4px 4px 12px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.start-menu-sidebar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 28px;
+  background: linear-gradient(to top, #000080, #1084d0);
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 8px;
+}
+
+.start-menu-sidebar span {
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing: 1px;
+}
+
+.start-menu-items {
+  margin-left: 28px;
+  padding: 4px;
+}
+
+.menu-item {
+  padding: 8px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  transition: all 0.1s;
+}
+
+.menu-item:hover {
+  background: var(--blue);
+  color: #fff;
+}
+
+.menu-item-icon {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+}
+
+.menu-divider {
+  height: 1px;
+  background: var(--mid);
+  margin: 2px 4px;
+  box-shadow: 0 1px 0 var(--light);
+}
+
+@media (max-width: 640px) {
+  .taskbar {
+    height: 48px;
+    padding: 4px 2px;
+  }
+
+  .task-btn {
+    min-width: 70px;
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+  
+  .start-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+}
