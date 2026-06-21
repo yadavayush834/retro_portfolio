@@ -1,5 +1,5 @@
 /* ═══════════════════════════
-   Window Component Styles
+   macOS Window Component Styles
    ═══════════════════════════ */
 
 .window-wrapper {
@@ -10,41 +10,41 @@
 .window-wrapper.maximized {
   position: fixed !important;
   left: 0 !important;
-  top: 0 !important;
+  top: 28px !important;
+  width: 100% !important;
+  height: calc(100vh - 28px - 44px) !important;
 }
 
 .window {
-  background: var(--silver);
-  min-width: 260px;
-  min-height: 180px;
-  resize: both;
-  overflow: auto;
-  box-shadow:
-    inset 1px 1px 0 var(--light),
-    inset -1px -1px 0 var(--mid),
-    inset -2px -2px 0 var(--dark),
-    inset 2px 2px 0 var(--light),
-    4px 4px 10px rgba(0, 0, 0, 0.3);
+  background: var(--mac-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--mac-shadow-lg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  min-width: 300px;
+  min-height: 200px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .window-wrapper.maximized .window {
-  resize: none;
-  box-shadow:
-    inset 1px 1px 0 var(--light),
-    inset -1px -1px 0 var(--mid),
-    inset -2px -2px 0 var(--dark),
-    inset 2px 2px 0 var(--light);
+  border-radius: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .title-bar {
-  background: linear-gradient(90deg, #000080, #1084d0);
-  color: #fff;
-  padding: 3px 4px;
+  background: transparent;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: move;
   user-select: none;
+  -webkit-app-region: drag;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .window-wrapper.maximized .title-bar {
@@ -52,57 +52,117 @@
 }
 
 .title-bar.focused {
-  background: linear-gradient(90deg, #000080, #1084d0);
+  background: transparent;
 }
 
 .title-bar.unfocused {
-  background: linear-gradient(90deg, #808080, #a0a0a0);
+  opacity: 0.7;
 }
 
 .title-text {
   font-size: 13px;
-  font-weight: bold;
+  font-weight: 600;
+  color: var(--mac-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding-left: 4px;
+  flex: 1;
+  text-align: center;
+  margin-left: 60px;
+  margin-right: 60px;
 }
 
 .title-actions {
   display: flex;
-  gap: 2px;
+  gap: 8px;
   flex-shrink: 0;
+  position: absolute;
+  left: 16px;
 }
 
-/* ── Title Bar Buttons (Win95 style) ── */
+/* ── macOS Traffic Light Buttons ── */
 .title-btn {
-  width: 22px;
-  height: 22px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 7px;
   font-weight: bold;
-  color: #000;
+  color: transparent;
   user-select: none;
   cursor: pointer;
-  transition: filter 0.08s;
-  background: var(--silver);
-  box-shadow:
-    inset 1px 1px 0 var(--light),
-    inset -1px -1px 0 var(--mid),
-    inset -2px -2px 0 var(--dark);
+  transition: all 0.15s ease;
+  position: relative;
 }
 
-.title-btn:hover {
-  filter: brightness(1.08);
+.title-btn::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transition: all 0.15s ease;
 }
 
-.title-btn:active {
-  box-shadow:
-    inset -1px -1px 0 var(--light),
-    inset 1px 1px 0 var(--mid),
-    inset 2px 2px 0 var(--dark);
+/* Close button - Red */
+.close-btn {
+  background: var(--mac-close);
+}
+
+.close-btn::before {
+  background: linear-gradient(135deg, #ff7b6e, #ff5f57);
+}
+
+.close-btn:hover {
+  background: var(--mac-close-hover);
+}
+
+.close-btn:hover::after {
+  content: '✕';
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 8px;
+}
+
+/* Minimize button - Yellow */
+.minimize-btn {
+  background: var(--mac-minimize);
+}
+
+.minimize-btn::before {
+  background: linear-gradient(135deg, #ffc94d, #febc2e);
+}
+
+.minimize-btn:hover {
+  background: var(--mac-minimize-hover);
+}
+
+.minimize-btn:hover::after {
+  content: '−';
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 10px;
+  margin-top: -1px;
+}
+
+/* Maximize button - Green */
+.maximize-btn {
+  background: var(--mac-maximize);
+}
+
+.maximize-btn::before {
+  background: linear-gradient(135deg, #4fd963, #28c840);
+}
+
+.maximize-btn:hover {
+  background: var(--mac-maximize-hover);
+}
+
+.maximize-btn:hover::after {
+  content: '+';
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 10px;
+  margin-top: -1px;
 }
 
 .title-btn span {
@@ -110,59 +170,16 @@
   display: block;
 }
 
-/* Minimize button */
-.minimize-btn span {
-  font-size: 14px;
-  margin-top: 4px;
-}
-
-/* Maximize button */
-.maximize-btn span {
-  font-size: 13px;
-}
-
-/* Close button — red accent on hover */
-.close-btn:hover {
-  background: #e04040;
-  color: #fff;
-}
-
-.close-btn:hover span {
-  color: #fff;
-}
-
 .window-body {
-  padding: 12px;
+  padding: 0;
   font-size: 13px;
   overflow: auto;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .window-wrapper.maximized .window-body {
-  height: calc(100% - 28px);
-}
-
-/* ── Resize Handle ── */
-.window::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 16px;
-  height: 16px;
-  cursor: se-resize;
-  background:
-    linear-gradient(135deg,
-      transparent 30%,
-      var(--mid) 30%, var(--mid) 40%,
-      transparent 40%, transparent 55%,
-      var(--mid) 55%, var(--mid) 65%,
-      transparent 65%, transparent 80%,
-      var(--mid) 80%, var(--mid) 90%,
-      transparent 90%);
-}
-
-.window-wrapper.maximized .window::after {
-  display: none;
+  height: calc(100% - 44px);
 }
 
 @media (max-width: 640px) {
@@ -174,5 +191,11 @@
   .window {
     width: 100% !important;
     max-height: 60vh;
+    border-radius: var(--radius-md);
+  }
+  
+  .title-text {
+    margin-left: 50px;
+    margin-right: 50px;
   }
 }

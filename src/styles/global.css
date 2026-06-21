@@ -1,35 +1,62 @@
 /* ═══════════════════════════════════════
-   Win95 Ultimate Edition — Global Styles
+   macOS Big Sur / Monterey Style
    ═══════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --teal: #008080;
-  --silver: #c0c0c0;
-  --light: #ffffff;
-  --dark: #000000;
-  --mid: #808080;
-  --blue: #000080;
-  --font: "VT323", "MS Sans Serif", "Courier New", system-ui, monospace;
-  --shadow-outset:
-    inset 1px 1px 0 var(--light),
-    inset -1px -1px 0 var(--mid),
-    inset -2px -2px 0 var(--dark),
-    inset 2px 2px 0 var(--light);
-  --shadow-inset:
-    inset 1px 1px 0 var(--dark),
-    inset -1px -1px 0 var(--light),
-    inset -2px -2px 0 var(--light),
-    inset 2px 2px 0 var(--mid);
-  --shadow-btn:
-    inset 1px 1px 0 var(--light),
-    inset -1px -1px 0 var(--mid),
-    inset -2px -2px 0 var(--dark);
-  --shadow-btn-pressed:
-    inset -1px -1px 0 var(--light),
-    inset 1px 1px 0 var(--mid),
-    inset 2px 2px 0 var(--dark);
+  /* macOS Colors */
+  --mac-blue: #007AFF;
+  --mac-green: #34C759;
+  --mac-yellow: #FFCC00;
+  --mac-red: #FF3B30;
+  --mac-orange: #FF9500;
+  --mac-purple: #AF52DE;
+  --mac-pink: #FF2D55;
+  --mac-teal: #5AC8FA;
+  --mac-indigo: #5856D6;
+  
+  /* macOS System Colors */
+  --mac-bg: #F5F5F7;
+  --mac-surface: rgba(255, 255, 255, 0.85);
+  --mac-surface-dark: rgba(255, 255, 255, 0.7);
+  --mac-sidebar: rgba(240, 240, 245, 0.85);
+  --mac-border: rgba(0, 0, 0, 0.1);
+  --mac-text: #1D1D1F;
+  --mac-text-secondary: #6E6E73;
+  --mac-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  --mac-shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --mac-shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.25);
+  
+  /* Menu Bar */
+  --mac-menubar-bg: rgba(255, 255, 255, 0.7);
+  --mac-menubar-blur: blur(20px);
+  
+  /* Dock */
+  --mac-dock-bg: rgba(255, 255, 255, 0.4);
+  --mac-dock-blur: blur(15px);
+  
+  /* Window Controls */
+  --mac-close: #FF5F57;
+  --mac-minimize: #FEBC2E;
+  --mac-maximize: #28C840;
+  --mac-close-hover: #FF3B30;
+  --mac-minimize-hover: #FFA500;
+  --mac-maximize-hover: #34C759;
+  
+  /* Gradients */
+  --mac-wallpaper: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  --mac-glass: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+  
+  /* Typography */
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-dock: 18px;
 }
 
 * {
@@ -42,84 +69,84 @@ html, body, #root {
   width: 100%;
   height: 100%;
   font-family: var(--font);
-  background: var(--teal);
+  background: var(--mac-wallpaper);
   overflow: hidden;
   font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Scrollbar Win95 Style ── */
+/* ── macOS Scrollbar ── */
 ::-webkit-scrollbar {
-  width: 16px;
-  height: 16px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--silver);
-  box-shadow: var(--shadow-inset);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--silver);
-  box-shadow: var(--shadow-btn);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:active {
-  box-shadow: var(--shadow-btn-pressed);
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
 }
 
-::-webkit-scrollbar-button {
-  background: var(--silver);
-  box-shadow: var(--shadow-btn);
-  width: 16px;
-  height: 16px;
-}
-
-/* ── Retro Form Elements ── */
+/* ── macOS Form Elements ── */
 input, textarea, select {
   font-family: var(--font);
   font-size: 13px;
-  background: #fff;
-  padding: 6px;
-  border: none;
-  box-shadow: var(--shadow-inset);
+  background: rgba(255, 255, 255, 0.8);
+  padding: 8px 12px;
+  border: 1px solid var(--mac-border);
+  border-radius: var(--radius-sm);
   outline: none;
+  transition: all 0.2s ease;
 }
 
 input:focus, textarea:focus {
-  outline: 1px dotted var(--blue);
+  border-color: var(--mac-blue);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
 }
 
 button {
   font-family: var(--font);
   font-size: 13px;
-  padding: 6px 14px;
-  background: var(--silver);
+  padding: 8px 16px;
+  background: var(--mac-blue);
+  color: white;
   border: none;
-  box-shadow: var(--shadow-btn);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   user-select: none;
-  transition: box-shadow 0.05s;
-}
-
-button:active {
-  box-shadow: var(--shadow-btn-pressed);
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 button:hover {
-  filter: brightness(1.05);
+  background: #0066D6;
+  transform: scale(1.02);
 }
 
-/* ── Status Inset ── */
-.status-inset {
-  padding: 6px;
-  background: #e0e0e0;
-  box-shadow: var(--shadow-inset);
-  font-size: 12px;
+button:active {
+  transform: scale(0.98);
+}
+
+button.secondary {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--mac-text);
+}
+
+button.secondary:hover {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 /* ── Selection ── */
 ::selection {
-  background: var(--blue);
+  background: var(--mac-blue);
   color: white;
 }
 

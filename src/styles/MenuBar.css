@@ -1,0 +1,119 @@
+/* ═══════════════════════════
+   macOS Menu Bar Styles
+   ═══════════════════════════ */
+
+.menubar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  background: var(--mac-menubar-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 10000;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--mac-text);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.menubar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.apple-logo {
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.apple-logo:hover {
+  opacity: 0.7;
+}
+
+.app-name {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.menubar-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.menu-item {
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-weight: 400;
+}
+
+.menu-item:hover {
+  opacity: 0.7;
+}
+
+.control-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.control-icon {
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.control-icon:hover {
+  opacity: 0.7;
+}
+
+.datetime {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.date {
+  cursor: pointer;
+}
+
+.time {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .menubar {
+    padding: 0 12px;
+  }
+  
+  .menubar-left {
+    gap: 12px;
+  }
+  
+  .menubar-right {
+    gap: 12px;
+  }
+  
+  .menu-item {
+    display: none;
+  }
+  
+  .control-center {
+    gap: 8px;
+  }
+  
+  .date {
+    display: none;
+  }
+}
